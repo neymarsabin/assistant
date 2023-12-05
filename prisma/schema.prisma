@@ -12,8 +12,11 @@ datasource db {
 
 model Docs {
   id Int @id @default(autoincrement())
+  content String
+  identifier String
   aId String
   url String @unique
+  @@index([identifier])
 }
 
 model Assistant {
