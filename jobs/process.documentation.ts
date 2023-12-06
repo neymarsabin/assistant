@@ -30,13 +30,52 @@ client.defineJob({
                     .then(async (response) => {
                         response.data.forEach(async (res) => {
                             const textUuid = uuidv4();
-                            await prisma.docs.upsert({
-                                where: {
+                            const contentForUrl = await prisma.docs.upsert({
+                                select: {
+                                  id: true,
+                                  content: true
+                                }, where: {
                                     url: res.url
                                 }, update: {
-                                    content: res.texts[0], identifier: textUuid
+                                    content: res.texts[0]
                                 }, create: {
                                     url: res.url, content: res.texts[0], identifier: textUuid
+                                }
+                            });
+                            const file = await io.openai.files.createAndWaitForProcessing(`upload-file-${contentForUrl.id}-${textUuid}`, {
+                                purpose: "assistants",
+                                file: contentForUrl.content
+                            })
+
+                            let currentAssistant = await prisma.assistant.findFirst({
+                                 where: {
+                                     url: res.url
+                                 }
+                            });
+
+                            if(currentAssistant) {
+                                return openai.beta.assistants.update(currentAssistant.aId, {
+                                    file_ids: [file.id]
+                                })
+                            } else {
+                                currentAssistant = openai.beta.assistants.create({
+                                    name: textUuid,
+                                    description: "Portfolio",
+                                    instructions: "You are a documentation assistant, you have been loaded with documentation from",
+                                    model: "gpt-3.5-turbo",
+                                    tools: [{ type: "code_interpreter" }, { type: "retrieval" }],
+                                    file_ids: [file.id]
+                                });
+                            }
+
+                            await prisma.assistant.upsert({
+                                where: {
+                                    url: res.url,
+                                }, update: {
+                                    aId: currentAssistant.id,
+                                }, create: {
+                                    aId: currentAssistant.id,
+                                    url: res.url
                                 }
                             })
                         })
