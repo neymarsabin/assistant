@@ -6,6 +6,8 @@
 .pnp.js
 .yarn/install-state.gz
 .env
+# ignore all tmp files
+/tmp
 
 # testing
 /coverage
