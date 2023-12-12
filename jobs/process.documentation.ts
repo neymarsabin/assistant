@@ -4,7 +4,7 @@ import { object, string } from 'zod';
 import { JSDOM } from 'jsdom';
 import axios from 'axios';
 import { client } from '../trigger';
-import { openai } from '../app/helper/open.ai';
+import { openaiTrigger, openai } from '../app/helper/open.ai';
 import { prisma } from '../app/helper/prisma';
 
 client.defineJob({
@@ -18,7 +18,7 @@ client.defineJob({
         })
     }),
     integrations: {
-        openai
+        openaiTrigger
     },
     run: async (payload, io, ctx) => {
     //  get the data modify the data accordingly
@@ -42,10 +42,11 @@ client.defineJob({
                                     url: res.url, content: res.texts[0], identifier: textUuid
                                 }
                             });
-                            const file = await io.openai.files.createAndWaitForProcessing(`upload-file-${contentForUrl.id}-${textUuid}`, {
+
+                            const file = await io.openaiTrigger.files.createAndWaitForProcessing(`upload-file-${contentForUrl.id}-${textUuid}`, {
                                 purpose: "assistants",
                                 file: contentForUrl.content
-                            })
+                            });
 
                             let currentAssistant = await prisma.assistant.findFirst({
                                  where: {
@@ -54,17 +55,17 @@ client.defineJob({
                             });
 
                             if(currentAssistant) {
-                                return openai.beta.assistants.update(currentAssistant.aId, {
+                                currentAssistant = openai.beta.assistants.update(currentAssistant.aId, {
                                     file_ids: [file.id]
                                 })
                             } else {
-                                currentAssistant = openai.beta.assistants.create({
+                                currentAssistant = await openai.beta.assistants.create({
                                     name: textUuid,
                                     description: "Portfolio",
                                     instructions: "You are a documentation assistant, you have been loaded with documentation from",
-                                    model: "gpt-3.5-turbo",
                                     tools: [{ type: "code_interpreter" }, { type: "retrieval" }],
-                                    file_ids: [file.id]
+                                    file_ids: [file.id],
+                                    model: "gpt-3.5-turbo-1106"
                                 });
                             }
 
@@ -77,7 +78,7 @@ client.defineJob({
                                     aId: currentAssistant.id,
                                     url: res.url
                                 }
-                            })
+                            });
                         })
                     })
                     .catch((error) => {
