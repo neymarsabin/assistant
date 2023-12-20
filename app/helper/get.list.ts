@@ -1,4 +1,4 @@
-import {prisma} from "@openai-assistant/helper/prisma.client";
+import { prisma } from "./prisma";
 
 // Get the list of all the available assistants
 export const getList = () => {

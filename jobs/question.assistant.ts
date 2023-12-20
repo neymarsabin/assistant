@@ -35,7 +35,6 @@ client.defineJob({
 
         // check the status of the thread
         if(run.status !== "completed") {
-            console.log("not completed!!!");
             throw new Error(`Run finished with status ${run.status}: ${JSON.stringify(run.last_error)}`);
         }
 
