@@ -1,7 +1,7 @@
 "use client"
 
-import { Fc, useEffect } from "react";
-import { ExtendedAssistant } from "./components/main";
+import { FC, useEffect } from "react";
+import { ExtendedAssistant } from "./main";
 import { useEventRunDetails } from "@trigger.dev/react";
 
 export const Loading: FC<{eventId: string, onFinish: () => void}> = (props) => {

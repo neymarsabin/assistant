@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 
     // check that we have assistant id and message
     if (!body.id || !body.message) {
-        return new Reponse(JSON.stringify({ error: 'ID and message are required' }), { status: 400 })
+        return new Response(JSON.stringify({ error: 'ID and message are required' }), { status: 400 })
     }
 
     // get the assistant id in OpenAI from the id in the database

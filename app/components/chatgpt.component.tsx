@@ -1,6 +1,6 @@
 "use client";
 import {FC, useCallback, useEffect, useRef, useState} from "react";
-import {ExtendedAssistant} from "@openai-assistant/components/main";
+import {ExtendedAssistant} from "./main";
 import Markdown from 'react-markdown'
 import {useEventRunDetails} from "@trigger.dev/react";
 

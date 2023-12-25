@@ -21,9 +21,6 @@ client.defineJob({
         openaiTrigger
     },
     run: async (payload, io, ctx) => {
-    //  get the data modify the data accordingly
-    // insert that data into the database
-    // this must be a io.runTask function
         return io.runTask('grab-texts-from-portfolio', async () => {
             try {
                 await axios.get('http://localhost:4567/posts')

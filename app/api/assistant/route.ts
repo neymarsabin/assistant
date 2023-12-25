@@ -1,4 +1,4 @@
-import { client } from '../../../trigger/';
+import { client } from '../../../trigger';
 import { prisma } from '../../helper/prisma';
 
 export async function POST(request: Request) {
