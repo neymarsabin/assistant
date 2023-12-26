@@ -2,16 +2,16 @@ import { prisma } from '../../helper/prisma';
 import { client } from '../../../trigger';
 
 export async function POST(request: Request) {
-    const body = await request.json();
+  const body = await request.json();
 
-    // check that we have assistant id and message
-    if (!body.id || !body.message) {
-        return new Response(JSON.stringify({ error: 'ID and message are required' }), { status: 400 })
-    }
+  // check that we have assistant id and message
+  if (!body.id || !body.message) {
+      return new Response(JSON.stringify({ error: 'ID and message are required' }), { status: 400 })
+  }
 
-    // get the assistant id in OpenAI from the id in the database
+  // get the assistant id in OpenAI from the id in the database
   const assistant = await prisma.assistant.findUnique({
-      where: {
+    where: {
           id: +body.id
       }
   });

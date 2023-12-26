@@ -1,11 +1,11 @@
 "use client"
 
 import { Assistant } from '@prisma/client';
-import { useCallback, useState } from 'react';
-import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
-import { ChatgptComponent } from './chatgpt.component';
-import { AssistantList } from './assistant.list';
 import { TriggerProvider } from '@trigger.dev/react';
+import { useCallback, useState } from 'react';
+import { ChatgptComponent } from './chatgpt.component';
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { AssistantList } from './assistant.list';
 
 export interface ExtendedAssistant extends Assistant {
     pending?: boolean;
@@ -28,8 +28,8 @@ export default function Main({ list }: { list: ExtendedAssistant[] }) {
         setAssistantState([...assistantState, { ...assistantResponse, url: data.url, pending: true }]);
     }, [assistantState])
 
-    const changeStatus = useCallback(( val: ExtendedAssistant ) => async () => {
-        const assistantResponse = await ( await fetch('/api/assistant?url=${val.url}', {
+    const changeStatus = useCallback((val: ExtendedAssistant) => async () => {
+        const assistantResponse = await (await fetch('/api/assistant?url=${val.url}', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ export default function Main({ list }: { list: ExtendedAssistant[] }) {
         <TriggerProvider publicApiKey={process.env.NEXT_PUBLIC_TRIGGER_PUBLIC_API_KEY!}>
             <div className="w-full max-w-2xl mx-auto p-6 flex flex-col gap-4">
                 <form className="flex items-center space-x-4" onSubmit={handleSubmit(submit)}>
-                    <input className="flex-grow p-3 border border-black/20 rounded-xl" placeholder="Add documentation link" type="text" {...register('url', {required: 'true'})} />
+                    <input className="flex-grow p-3 border border-black/20 rounded-xl" placeholder="Add documentation link" type="text" {...register('url', { required: 'true' })} />
                     <button className="flex-shrink p-3 border border-black/20 rounded-xl" type="submit">
                         Add
                     </button>

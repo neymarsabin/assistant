@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Assistant
+This is an personal project that adds a personal prompt to my portfolio website and respond to commands based on the contents of my portfolio website. This project uses the **ChatGpt Assistant** feature.
+
+### Services
+There are multiple services working.
+- **The Parser** -> a ruby sinatra service that parses my portfolio website based on the sitemap and responds with URL and its contents upon HTTP requests. 
+- **trigger.dev** -> a background job processor that has jobs to get data from the parser and upload thom into the ChatGPT Assistant API
+- **the API** -> the API service is responsible for fetching data from the database and scheduled trigger.dev background jobs
 
 ## Getting Started
-
-First, run the development server:
-
+To run the API server:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To run the parser service:
+```bash
+cd scraper && ruby main.rb
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+To run the trigger.dev background processor:
+```bash
+npx @trigger.dev/cli@latest dev
+```
