@@ -1,30 +1,64 @@
 import { prisma } from '../../helper/prisma';
 import { client } from '../../../trigger';
+import { openai } from "../../helper/open.ai"
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 export async function POST(request: Request) {
   const body = await request.json();
+  let thread;
 
-  // check that we have assistant id and message
-  if (!body.id || !body.message) {
-      return new Response(JSON.stringify({ error: 'ID and message are required' }), { status: 400 })
+  if (!body.message) {
+    return new Response(JSON.stringify({ error: 'ID and message are required' }), { status: 400 })
   }
 
-  // get the assistant id in OpenAI from the id in the database
-  const assistant = await prisma.assistant.findUnique({
-    where: {
-          id: +body.id
-      }
-  });
+  if (!body.threadId) {
+    thread = await openai.beta.threads.create();
+  }
 
-  // We send an event to the trigger to process the documentation
-  const {id: eventId} = await client.sendEvent({
-      name: "question.assistant.event",
-      payload: {
-          content: body.message,
-          aId: assistant?.aId,
-          threadId: body.threadId
-      },
-  });
+  const runThreadId = body.threadId ? body.threadId : thread.id
 
-  return new Response(JSON.stringify({eventId}), {status: 200});
+  await openai.beta.threads.messages.create(
+    runThreadId,
+    {
+      content: body.message,
+      role: 'user'
+    })
+
+  const run = await openai.beta.threads.runs.create(
+    runThreadId,
+    {
+      assistant_id: "asst_0NNAQwtxUs5d1BgGUxkuhiBZ",
+      model: 'gpt-3.5-turbo-1106',
+      instructions: "Never mention that a file was uploaded in the message responses."
+    }
+  )
+
+  let runStatus = await openai.beta.threads.runs.retrieve(
+    runThreadId,
+    run.id
+  )
+
+  do {
+    runStatus = await openai.beta.threads.runs.retrieve(
+      runThreadId,
+      run.id
+    )
+    await sleep(5000)
+  } while (runStatus.status != 'completed')
+
+  const messages = await openai.beta.threads.messages.list(body.threadId ? body.threadId : thread.id, {
+    query: {
+      limit: '1'
+    }
+  })
+
+  const content = messages.data[0].content[0];
+
+  if (content.type === "text") {
+    return new Response(JSON.stringify({
+      content: content.text.value,
+      threadId: runThreadId
+    }), { status: 200 })
+  }
 }

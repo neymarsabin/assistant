@@ -28,10 +28,6 @@ export const AssistantList: FC<{ val: ExtendedAssistant, onFinish: () => void }>
     }
 
     return (
-        <div
-            key={val.url}
-            className="pointer relative bg-green-300 border-green-500 p-1 px-3 text-green-950 border rounded-2xl hover:bg-red-300 hover:border-red-500 hover:text-red-950 before:content-[attr(data-content)]"
-            data-content={val.url}
-        />
+        <div> </div>
     )
 }
