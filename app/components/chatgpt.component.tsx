@@ -20,7 +20,6 @@ export const ChatgptComponent = ({ list }: { list: ExtendedAssistant[] }) => {
             body: JSON.stringify({ message, threadId }),
         })).json();
 
-        console.log("ThreadId: ", messageResponse.threadId)
         if (!threadId) {
             setThreadId(messageResponse.threadId);
         }
