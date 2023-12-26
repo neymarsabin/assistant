@@ -23,7 +23,7 @@ client.defineJob({
     run: async (payload, io, ctx) => {
         return io.runTask('grab-texts-from-portfolio', async () => {
             try {
-                await axios.get('http://localhost:4567/posts')
+                await axios.get(`${process.env.PARSER_API}/posts`)
                     .then(async (response) => {
                         response.data.forEach(async (res) => {
                             const textUuid = uuidv4();
