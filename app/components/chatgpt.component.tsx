@@ -62,6 +62,7 @@ export const ChatgptComponent = ({ list }: { list: ExtendedAssistant[] }) => {
                             fullWidth
                             onChange={(e) => setMessage(e.target.value)}
                             disabled={loading}
+                            value={message}
                         />
                     </div>
                     <div className="submit-button-group">
