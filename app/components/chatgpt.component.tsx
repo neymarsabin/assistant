@@ -3,51 +3,84 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { ExtendedAssistant } from "./main";
 import Markdown from 'react-markdown'
 import { useEventRunDetails } from "@trigger.dev/react";
+import { Paper, TextField, Button, Card, CircularProgress } from '@mui/material';
 
 export const ChatgptComponent = ({ list }: { list: ExtendedAssistant[] }) => {
     const url = useRef<HTMLSelectElement>(null);
     const [message, setMessage] = useState('');
     const [messagesList, setMessagesList] = useState([] as any);
     const [threadId, setThreadId] = useState<string>('' as string);
+    const [loading, setLoading] = useState<boolean>(false as boolean);
 
     const submitForm = useCallback(async (e: any) => {
         e.preventDefault();
-        setMessagesList((messages) => [...messages, { message: `**[ME]** ${message}` }]);
-        setMessage('');
-
+        setMessagesList((messages) => [...messages, { message: `~/you: ${message}` }]);
+        setLoading(true);
         const messageResponse = await (await fetch('/api/message', {
             method: 'POST',
             body: JSON.stringify({ message, threadId }),
         })).json();
+        setMessage('')
+        setLoading(false)
 
         if (!threadId) {
             setThreadId(messageResponse.threadId);
         }
 
-        setMessagesList((messages) => [...messages, { message: messageResponse.content } ]);
+        setMessagesList((messages) => [...messages, { message: `~/zodiac: ${messageResponse.content}` }]);
     }, [message, messagesList, url, threadId]);
 
+
+    useState(() => {
+        setMessagesList((messages) => [...messages, {
+            message: '~/zodiac: Hello, how can I help you today?'
+        }]);
+    }, []);
+
     return (
-        <div className="border border-black/50 rounded-2xl flex flex-col">
-            <div className="flex-1 flex flex-col gap-3 py-3 w-full min-h-[500px] max-h-[1000px] overflow-y-auto overflow-x-hidden messages-list">
-                {messagesList.map((val, index) => (
-                    <div key={index} className={`flex border-b border-b-black/20 pb-3 px-3`}>
-                        <div className="w-full">
-                            <Markdown>{val.message}</Markdown>
+        <div elevation={5}>
+            <div className="main">
+                <div className="main-container">
+                    {messagesList.map((message) => {
+                        return (
+                            <Card>
+                                <div className="message-section">
+                                    {message.message}
+                                </div>
+                            </Card>
+                        )
+                    })}
+                </div>
+                <div className="text-form-group">
+                    <div className="text-form">
+                        <TextField
+                            id="outlined-basic"
+                            variant="filled"
+                            color="success"
+                            multiline
+                            rows={2}
+                            fullWidth
+                            onChange={(e) => setMessage(e.target.value)}
+                            disabled={loading}
+                        />
+                    </div>
+                    <div className="submit-button-group">
+                        <div>
+                            <Button
+                                variant="contained"
+                                onClick={submitForm}
+                                color="success"
+                                disabled={loading}
+                            >
+                                Submit
+                            </Button>
+                        </div>
+                        <div className="loader-section">
+                            {loading && <CircularProgress color="success" size={20} />}
                         </div>
                     </div>
-                ))}
-            </div>
-            <form onSubmit={submitForm}>
-                <div className="border-t border-t-black/50 h-[60px] gap-3 px-3 flex items-center">
-                    <div className="flex-1">
-                        <input value={message} onChange={(e) => setMessage(e.target.value)} className="read-only:opacity-20 outline-none border border-black/20 rounded-xl p-2 w-full" placeholder="Type your message here" />
-                    </div>
-                    <div>
-                        <button className="border border-black/20 rounded-xl p-2 disabled:opacity-20" disabled={message.length < 3}>Send</button>
-                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     )
 }

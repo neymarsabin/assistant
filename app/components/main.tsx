@@ -17,7 +17,7 @@ export default function Main({ list }: { list: ExtendedAssistant[] }) {
 
     return (
         <TriggerProvider publicApiKey={process.env.NEXT_PUBLIC_TRIGGER_PUBLIC_API_KEY!}>
-            <div className="w-full max-w-2xl mx-auto p-6 flex flex-col gap-4">
+            <div className="w-full max-w-2xl mx-auto pt-20 bg-grey text-white">
                 <ChatgptComponent list={assistantState} />
             </div>
         </TriggerProvider>

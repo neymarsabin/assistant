@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     {
       assistant_id: "asst_0NNAQwtxUs5d1BgGUxkuhiBZ",
       model: 'gpt-3.5-turbo-1106',
-      instructions: "Never mention that a file was uploaded in the message responses."
+      instructions: "Your name is zodiac. Also don't mention about the uploaded file or document. Speak like you are zodiac, Sabin's personal assitant."
     }
   )
 
